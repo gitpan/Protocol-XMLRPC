@@ -4,7 +4,7 @@ use Any::Moose;
 use Protocol::XMLRPC::MethodCall;
 use Protocol::XMLRPC::MethodResponse;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has http_req_cb => (
     required => 1,
@@ -23,10 +23,20 @@ sub call {
         $method_call->add_param($arg);
     }
 
+    my $host = $url;
+    $host =~ s|^http(s)?://||;
+    $host =~ s|/.*$||;
+
+    my $headers = {
+        'Content-Type' => 'text/xml',
+        'User-Agent'   => 'Protocol-XMLRPC (Perl)',
+        'Host'         => $host
+    };
+
     $self->http_req_cb->(
-        $self, $url, "$method_call" =>
+        $self, $url, 'POST', $headers, "$method_call" =>
           sub {
-            my ($self, $status, $body) = @_;
+            my ($self, $status, $headers, $body) = @_;
 
             return $cb->($self) unless $status && $status == 200;
 
@@ -73,12 +83,13 @@ Protocol::XMLRPC - Asynchronous, web framework agnostic XML-RPC implementation
 =head1 DESCRIPTION
 
 L<Protocol::XMLRPC> is asynchronous, web framework agnostic XML-RPC
-implementation. You provide callback subrouting for posting method request. You
-can use L<LWP>, L<Mojo::Client> etc for this purpose.
+implementation. You provide callback subroutine for posting method requests.
+L<LWP>, L<Mojo::Client> etc can be used for this purpose.
 
-Perl doesn't have scalar types, because of this parameters types are guessed,
-but you can pass explicit type if guessing is wrong for you. Read more about
-parameter creation at L<Protocol::XMLRPC::ValueFactory>.
+XML-RPC defined different parameters types. Perl5 doesn't have scalar types,
+because of this types are guessed, but you can pass explicit type if guessing is
+wrong for you. Read more about parameter creation at
+L<Protocol::XMLRPC::ValueFactory>.
 
 =head1 ATTRIBUTES
 
@@ -86,35 +97,43 @@ parameter creation at L<Protocol::XMLRPC::ValueFactory>.
 
     my $xmlrpc = Protocol::XMLRPC->new(
         http_req_cb => sub {
-            my ($self, $url, $headers, $body, $cb) = @_;
+            my ($self, $url, $method, $headers, $body, $cb) = @_;
 
             ...
 
             $cb->($self, $status, $headers, $body);
 
-A callback for sending request to the xmlrpc server.  Don't forget that
-User-Agent and Host headers are required by XML-RPC specification. Reqeust
-method must be POST also.
+A callback for sending request to the xmlrpc server. Don't forget that
+User-Agent and Host headers are required by XML-RPC specification. Default
+values are provided, but you are advised to change them.
 
-Callback receives these parameters:
+Request callback is called with:
 
-=head3 C<self>
+=item * B<self> L<Protocol::XMLRPC> instance
 
-L<Protocol::XMLRPC> instance.
+=item * B<url> server url (for example 'http://example.com/xmlrpc')
 
-=head3 C<url>
+=item * B<method> request method
 
-Server url (for example 'http://example.com/xmlrpc').
+=item * B<headers> request headers hash reference
 
-=head3 C<body>
+=item * B<body> request body to send. Holds L<Protocol::XMLRPC::MethodCall>
+string representation.
 
-Request body to send. Holds L<Protocol::XMLRPC::MethodCall> string
-representation.
+=item * B<cb> callback that must be called after response was received
 
-=head3 C<cb>
+Response callback must be called with:
 
-Callback that must be called after response was received. Must be provided with
-L<Protocol::XMLRPC> instance, response status and body.
+=item * B<self> L<Protocol::XMLRPC> instance
+
+=item * B<status> response status (200, 404 etc)
+
+=item * B<headers> response headers hash reference
+
+=item * B<body> response body
+
+Must be
+provided with L<Protocol::XMLRPC> instance, response status and body.
 
 =head1 METHODS
 
@@ -122,7 +141,7 @@ L<Protocol::XMLRPC> instance, response status and body.
 
     my $xmlrpc = Protocol::XMLRPC->new(http_req_cb => sub { ... });
 
-Creates L<Protocol::XMLRPC> instance. Argument b<http_req_cb> is required.
+Creates L<Protocol::XMLRPC> instance. Argument B<http_req_cb> is required.
 
 =head2 C<call>
 
