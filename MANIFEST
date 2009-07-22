@@ -1,5 +1,6 @@
 Changes
 lib/Protocol/XMLRPC.pm
+lib/Protocol/XMLRPC/Dispatcher.pm
 lib/Protocol/XMLRPC/Method.pm
 lib/Protocol/XMLRPC/MethodCall.pm
 lib/Protocol/XMLRPC/MethodResponse.pm
@@ -18,6 +19,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 t/00pod.t
 t/01pod-coverage.t
+t/dispatcher.t
 t/method-call.t
 t/method-response-fault.t
 t/method-response.t
