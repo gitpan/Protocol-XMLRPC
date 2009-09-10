@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Protocol-XMLRPC
-version:            0.06
+version:            0.07
 abstract:           Asynchronous, web framework agnostic XML-RPC implementation
 author:
     - Viacheslav Tykhanovskyi <vti@cpan.org>

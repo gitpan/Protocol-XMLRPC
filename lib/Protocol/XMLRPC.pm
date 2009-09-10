@@ -8,7 +8,7 @@ use Protocol::XMLRPC::MethodResponse;
 
 require Carp;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my $class = shift;
