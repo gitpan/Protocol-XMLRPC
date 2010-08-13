@@ -23,6 +23,7 @@ t/dispatcher.t
 t/method-call.t
 t/method-response-fault.t
 t/method-response.t
+t/system.t
 t/value-factory.t
 t/value/array.t
 t/value/base64.t

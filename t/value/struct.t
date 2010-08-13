@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 29;
+use Test::More tests => 28;
 
 use Protocol::XMLRPC::Value::String;
 use Protocol::XMLRPC::Value::Integer;
@@ -58,6 +58,3 @@ is_deeply($struct->value, {foo => 321, bar => 123});
 is(keys %{$struct->members}, 2);
 is($struct->members->{foo}->value, 321);
 is($struct->members->{bar}->value, 123);
-
-$struct = $class->new({foo => {bar => 'baz'}});
-like($struct->to_string, qr|<member><name>foo</name><value><struct><member><name>bar</name><value><string>baz</string></value></member></struct></value></member>|);

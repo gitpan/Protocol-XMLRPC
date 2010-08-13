@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Protocol-XMLRPC
-version:            0.07
+version:            0.08
 abstract:           Asynchronous, web framework agnostic XML-RPC implementation
 author:
     - Viacheslav Tykhanovskyi <vti@cpan.org>
@@ -18,7 +18,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.50
+generated_by:       ExtUtils::MakeMaker version 6.56
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

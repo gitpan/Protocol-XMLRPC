@@ -92,10 +92,10 @@ sub _parse_value {
     elsif ($type->getName eq 'struct') {
         my $struct = Protocol::XMLRPC::Value::Struct->new;
 
-        my @members = $type->getChildrenByTagName('member');
+        my @members = $type->getElementsByTagName('member');
         foreach my $member (@members) {
-            my ($name) = $member->getChildrenByTagName('name');
-            my ($value) = $member->getChildrenByTagName('value');
+            my ($name) = $member->getElementsByTagName('name');
+            my ($value) = $member->getElementsByTagName('value');
 
             if (my $param = $self->_parse_value($value)) {
                 $struct->add_member($name->textContent => $param);
@@ -110,7 +110,7 @@ sub _parse_value {
     elsif ($type->getName eq 'array') {
         my $array = Protocol::XMLRPC::Value::Array->new;
 
-        my ($data) = $type->getChildrenByTagName('data');
+        my ($data) = $type->getElementsByTagName('data');
 
         my (@values) = grep {$_->isa('XML::LibXML::Element')} $data->childNodes;
         foreach my $value (@values) {

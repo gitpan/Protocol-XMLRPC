@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 21;
 
 use Protocol::XMLRPC::MethodResponse;
 
@@ -55,7 +55,3 @@ is_deeply($res->param->value, []);
 $res = Protocol::XMLRPC::MethodResponse->new({});
 is("$res", qq|<?xml version="1.0"?><methodResponse><params><param><value><struct></struct></value></param></params></methodResponse>|);
 is_deeply($res->param->value, {});
-
-$xml = qq|<?xml version="1.0"?><methodResponse><params><param><value><struct><member><name>three</name><value><struct><member><name>description</name><value><string>three</string></value></member></struct></value></member><member><name>four</name><value><struct><member><name>description</name><value><string>four</string></value></member></struct></value></member></struct></value></param></params></methodResponse>|;
-$res = Protocol::XMLRPC::MethodResponse->parse($xml);
-is_deeply($res->param->value, {three => {description => 'three'}, four => {description => 'four'}});
