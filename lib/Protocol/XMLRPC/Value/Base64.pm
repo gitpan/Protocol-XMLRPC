@@ -13,6 +13,8 @@ sub parse {
     my $class = shift;
     my ($value) = @_;
 
+    die "Invalid 'Base64' value" unless $value =~ m/^[A-Za-z0-9\+\/=]+$/;
+
     return $class->new(MIME::Base64::decode_base64($value));
 }
 
@@ -72,16 +74,3 @@ Returns serialized Perl5 scalar.
     # </base64>'
 
 XML-RPC base64 string representation.
-
-=head1 AUTHOR
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2009, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
-=cut

@@ -3,6 +3,9 @@ package Protocol::XMLRPC::ValueFactory;
 use strict;
 use warnings;
 
+use B;
+use Scalar::Util qw(blessed);
+
 use Protocol::XMLRPC::Value::Double;
 use Protocol::XMLRPC::Value::String;
 use Protocol::XMLRPC::Value::Integer;
@@ -19,25 +22,26 @@ sub build {
     my ($type, $value) = @_;
     ($value, $type) = ($type, '') unless defined $value;
 
+    return $value if blessed($value);
+
+    # From JSON::PP
+    my $flags = B::svref_2object(\$value)->FLAGS;
+    my $is_number = $flags & (B::SVp_IOK | B::SVp_NOK)
+      and !($flags & B::SVp_POK) ? 1 : 0;
+
     if (($type && $type eq 'array') || ref($value) eq 'ARRAY') {
         return Protocol::XMLRPC::Value::Array->new($value);
     }
     elsif (($type && $type eq 'struct') || ref($value) eq 'HASH') {
         return Protocol::XMLRPC::Value::Struct->new($value);
     }
-    elsif (ref($value)) {
-        return $value;
-    }
-    elsif (($type && $type eq 'int') || $value =~ m/^(?:\+|-)?\d+$/) {
+    elsif (($type && $type eq 'int') || ($is_number && $value =~ m/^(?:\+|-)?\d+$/)) {
         return Protocol::XMLRPC::Value::Integer->new($value);
     }
-    elsif (($type && $type eq 'double') || $value =~ m/^(?:\+|-)?\d+\.\d+$/) {
+    elsif (($type && $type eq 'double') || ($is_number && $value =~ m/^(?:\+|-)?\d+\.\d+$/)) {
         return Protocol::XMLRPC::Value::Double->new($value);
     }
-    elsif (($type && $type eq 'boolean')
-        || $value eq 'true'
-        || $value eq 'false')
-    {
+    elsif (($type && $type eq 'boolean') || ref($value) eq 'SCALAR') {
         return Protocol::XMLRPC::Value::Boolean->new($value);
     }
     elsif (($type && $type eq 'datetime')
@@ -63,7 +67,7 @@ Protocol::XMLRPC::ValueFactory - value objects factory
     my $integer  = Protocol::XMLRPC::ValueFactory->build(1);
     my $double   = Protocol::XMLRPC::ValueFactory->build(1.2);
     my $datetime = Protocol::XMLRPC::ValueFactory->build('19980717T14:08:55');
-    my $boolean  = Protocol::XMLRPC::ValueFactory->build('true');
+    my $boolean  = Protocol::XMLRPC::ValueFactory->build(\1);
     my $string   = Protocol::XMLRPC::ValueFactory->build('foo');
 
 =head1 DESCRIPTION
@@ -78,16 +82,3 @@ types can be guessed.
 =head2 C<build>
 
 Builds new value object. If no instance was provided tries to guess type.
-
-=head1 AUTHOR
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2009, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
-=cut

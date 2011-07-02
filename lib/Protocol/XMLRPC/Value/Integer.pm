@@ -13,6 +13,16 @@ sub new {
     return $self;
 }
 
+sub parse {
+    my $class = shift;
+    my $string = shift;
+
+    die "Invalid 'Integer' value"
+      unless defined $string && $string =~ m/^(?:\+|-)?\d+$/;
+
+    return $class->new($string, @_);
+}
+
 sub alias { defined $_[1] ? $_[0]->{alias} = $_[1] : $_[0]->{alias} }
 
 sub type {'int'}
@@ -76,16 +86,3 @@ Returns serialized Perl5 scalar.
     # $integer->to_string is now '<int>1</int>'
 
 XML-RPC integer string representation.
-
-=head1 AUTHOR
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2009, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
-=cut

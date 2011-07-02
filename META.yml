@@ -1,24 +1,28 @@
 --- #YAML:1.0
 name:               Protocol-XMLRPC
-version:            0.08
-abstract:           Asynchronous, web framework agnostic XML-RPC implementation
+version:            0.09
+abstract:           Asynchronous, web framework agnostic XML-RPC implementation 
 author:
     - Viacheslav Tykhanovskyi <vti@cpan.org>
-license:            perl
+license:            artistic_2
 distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:
-    ExtUtils::MakeMaker:  0
+configure_requires:  {}
+build_requires:  {}
 requires:
     MIME::Base64:  0
+    perl:          5.008007
     Test::More:    0
+    Time::Local:   0
     XML::LibXML:   0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/vti/protocol-xmlrpc
 no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.55_02
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

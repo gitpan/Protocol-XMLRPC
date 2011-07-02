@@ -24,7 +24,7 @@ sub parse {
           Time::Local::timegm($second, $minute, $hour, $mday, --$month, $year);
     };
 
-    return if $@ || $epoch < 0;
+    die "Invalid 'DateTime' value" if $@ || $epoch < 0;
 
     return $class->new($epoch);
 }
@@ -96,16 +96,3 @@ Returns serialized Perl5 scalar.
     # $datetime->to_string is now '<dateTime.iso8601>20091302T23:31:30</dateTime.iso8601>'
 
 XML-RPC datetime string representation.
-
-=head1 AUTHOR
-
-Viacheslav Tykhanovskyi, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2009, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
-=cut
