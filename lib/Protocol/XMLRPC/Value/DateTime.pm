@@ -16,15 +16,26 @@ sub parse {
     my ($year, $month, $mday, $hour, $minute, $second) =
       ($datetime =~ m/(\d\d\d\d)(\d\d)(\d\d)T(\d\d):(\d\d):(\d\d)/);
 
+    die "Invalid 'Datetime' value"
+      unless defined $year
+          && defined $month
+          && defined $mday
+          && defined $hour
+          && defined $minute
+          && defined $second;
+
     my $epoch;
 
     # Prevent crash
     eval {
         $epoch =
           Time::Local::timegm($second, $minute, $hour, $mday, --$month, $year);
+        1;
+    } or do {
+        die "Invalid 'DateTime' value";
     };
 
-    die "Invalid 'DateTime' value" if $@ || $epoch < 0;
+    die "Invalid 'DateTime' value" if $epoch < 0;
 
     return $class->new($epoch);
 }
@@ -40,13 +51,8 @@ sub to_string {
     $month++;
 
     #19980717T14:08:55
-    $value =
-        $year
-      . sprintf('%02d', $month)
-      . sprintf('%02d', $mday) . 'T'
-      . sprintf('%02d', $hour) . ':'
-      . sprintf('%02d', $minute) . ':'
-      . sprintf('%02d', $second);
+    $value = sprintf('%d%02d%02dT%02d:%02d:%02d',
+        $year, $month, $mday, $hour, $minute, $second);
 
     return "<dateTime.iso8601>$value</dateTime.iso8601>";
 }

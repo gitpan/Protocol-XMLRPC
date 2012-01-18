@@ -31,8 +31,12 @@ sub parse {
 
     my $parser = XML::LibXML->new;
     my $doc;
-    eval {$doc = $parser->parse_string($xml); };
-    die "Can't parse XML: $@" if $@;
+    eval {
+        $doc = $parser->parse_string($xml);
+        1;
+    } or do {
+        die "Can't parse XML: $@";
+    };
 
     return $class->_parse_document($doc);
 }
@@ -48,6 +52,9 @@ sub _parse_value {
 
     if (@types == 1 && !$types[0]->isa('XML::LibXML::Element')) {
         return Protocol::XMLRPC::Value::String->new($types[0]->textContent);
+    }
+    elsif (@types == 0) {
+        return Protocol::XMLRPC::Value::String->new('');
     }
 
     my ($type) = grep { $_->isa('XML::LibXML::Element') } @types;
@@ -74,9 +81,9 @@ sub _parse_value {
     elsif ($type->getName eq 'struct') {
         my $struct = Protocol::XMLRPC::Value::Struct->new;
 
-        my @members = $type->getElementsByTagName('member');
+        my @members = $type->findnodes('member')->get_nodelist;
         foreach my $member (@members) {
-            my ($name) = $member->getElementsByTagName('name');
+            my ($name)  = $member->getElementsByTagName('name');
             my ($value) = $member->getElementsByTagName('value');
 
             if (defined(my $param = $self->_parse_value($value))) {
